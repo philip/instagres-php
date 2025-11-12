@@ -14,27 +14,13 @@ This SDK provides a PHP implementation of Neon's [Instagres](https://neon.com/do
 
 ## Installation
 
-### Via Composer (Recommended)
-
-Install the package using Composer:
-
 ```bash
 composer require philip/instagres
 ```
 
-### Manual Installation
-
-Alternatively, download or copy the `src/Client.php` file into your project and include it manually:
-
-```bash
-wget https://raw.githubusercontent.com/philip/instagres-php/main/src/Client.php
-```
-
-Note: Manual installation requires proper autoloading setup. Using Composer is recommended.
-
 ## Usage
 
-### Basic Usage
+### Basic usage
 
 ```php
 <?php
@@ -51,50 +37,21 @@ echo "Claim URL: {$database['claim_url']}\n";
 echo "Expires At: {$database['expires_at']}\n";
 ```
 
-### With Custom Referrer
+### Running the examples
 
-```php
-<?php
-
-require_once 'vendor/autoload.php';
-
-use Neon\Instagres\Client;
-
-// Identify your application with a custom referrer
-$database = Client::createClaimableDatabase('my-app-name');
-
-echo "Connection String: {$database['connection_string']}\n";
-echo "Claim URL: {$database['claim_url']}\n";
-echo "Expires At: {$database['expires_at']}\n";
-```
-
-### Running the Example
-
-First, install dependencies:
+If you've cloned the repository, you can run the included examples:
 
 ```bash
 composer install
-```
-
-Then run the example:
-
-```bash
 php examples/create-database.php
-
-# Or with a custom referrer:
-php examples/create-database.php my-custom-referrer
 ```
 
-### Database Seeding Example
+### Database seeding example
 
-Want to create a database with initial data? Check out the seeding example:
+Want to create a database with initial data? Seed with the included sample schema:
 
 ```bash
-# Seed with the included sample schema
 php examples/seed-database.php
-
-# Or use your own SQL file
-php examples/seed-database.php path/to/your-schema.sql
 ```
 
 This example demonstrates:
@@ -106,15 +63,7 @@ This example demonstrates:
 
 See [`examples/seed-database.php`](examples/seed-database.php) and [`examples/sample-schema.sql`](examples/sample-schema.sql) for the complete implementation.
 
-### More Examples
-
-See the [examples](examples/) directory for all available examples.
-
 ## Testing
-
-The SDK includes a comprehensive PHPUnit test suite.
-
-### Running Tests
 
 ```bash
 # Run all tests
@@ -124,17 +73,7 @@ composer test
 composer test:coverage
 ```
 
-### Test Coverage
-
-The test suite covers:
-- UUID generation validation
-- Claim URL generation
-- Connection string parsing (multiple formats)
-- URL decoding of credentials
-- Error handling for invalid inputs
-- All public API methods
-
-## API Reference
+## API reference
 
 ### `Client::createClaimableDatabase(string $referrer = 'neon/instagres', ?string $dbId = null): array`
 
@@ -153,15 +92,9 @@ Creates a claimable Neon database and returns connection information.
 - `NetworkException` - If HTTP request fails or returns non-success status
 - `InvalidResponseException` - If API response is invalid or missing required fields
 
-### `Client::generateUuid(): string`
-
-Generates a random UUID v4.
-
-**Returns:** A UUID string
-
 ### `Client::getClaimUrl(string $dbId): string`
 
-Gets the claim URL for a database.
+Gets the claim URL for a database. This URL is used to claim the temporary database into a Neon account, otherwise it expires (is deleted) after 72 hours.
 
 **Parameters:**
 - `$dbId` (string, required): The database UUID
@@ -191,6 +124,9 @@ Parses a PostgreSQL connection string into individual components and PDO-ready f
 
 ```php
 $database = Client::createClaimableDatabase();
+
+// The returned connection string URI looks similar to:
+// postgresql://user:pass@ep-jolly-fog.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
 $parsed = Client::parseConnectionString($database['connection_string']);
 
 // Use with PDO
@@ -202,30 +138,19 @@ echo "Port: {$parsed['port']}\n";
 echo "Database: {$parsed['database']}\n";
 ```
 
-## Database Details
+## Database details
 
-Created databases have the following characteristics:
+Databases are provisioned on AWS (eu-central-1) running PostgreSQL 17 with Neon Free plan limits. They expire after 72 hours unless claimed.
 
-- **Provider:** AWS
-- **Region:** eu-central-1
-- **PostgreSQL Version:** 17
-- **Lifespan:** 72 hours (unless claimed)
-- **Resource Limits:** Matches Neon's Free plan
-
-## Claiming a Database
+## Claiming a database
 
 To persist your database beyond 72 hours:
 
-1. Visit the claim URL returned by `getClaimUrl()`
+1. Visit the claim URL
 2. Sign in to your Neon account (or create one)
-3. Follow the instructions to claim the database
+3. Follow the instructions to claim the database (click a button)
 
-## Requirements
-
-- PHP 8.1 or higher
-- cURL extension enabled (usually enabled by default)
-
-## Use Cases
+## Use cases
 
 - Development and testing environments
 - Quick prototyping
@@ -233,54 +158,22 @@ To persist your database beyond 72 hours:
 - CI/CD pipelines requiring temporary databases
 - Demo applications
 
-## Error Handling
-
-The SDK throws specific exceptions on failures.
+## Error handling
 
 ```php
-<?php
-
-require_once 'vendor/autoload.php';
-
 use Neon\Instagres\Client;
 use Neon\Instagres\Exception\InstagresException;
-use Neon\Instagres\Exception\NetworkException;
-use Neon\Instagres\Exception\InvalidResponseException;
 
 try {
-    $database = Client::createClaimableDatabase('my-app');
-    // Use $database['connection_string'], $database['claim_url'], $database['expires_at']
-    echo "Database expires at: {$database['expires_at']}\n";
-} catch (NetworkException $e) {
-    // Handle network/HTTP errors
-    echo "Network error: {$e->getMessage()}\n";
-} catch (InvalidResponseException $e) {
-    // Handle invalid API responses
-    echo "Invalid response: {$e->getMessage()}\n";
+    $database = Client::createClaimableDatabase();
 } catch (InstagresException $e) {
-    // Handle any other SDK errors
     echo "Error: {$e->getMessage()}\n";
 }
 ```
 
-### Exception Hierarchy
-
-All exceptions extend `InstagresException`, which extends `RuntimeException`:
-
-- `InstagresException` - Base exception for all SDK errors
-  - `NetworkException` - HTTP/network failures, timeouts, or non-success status codes
-  - `InvalidResponseException` - Invalid or incomplete API responses
-
-## Future Enhancements
-
-Future versions may include:
-
-- .env file writing capabilities
-- SQL seeding support (beyond example)
-- CLI tool (similar to `npx get-db`)
-- Guzzle HTTP client support as alternative to curl
-- Integration tests with live API
-- Database claim command, via saved claim URL
+**Exception types:** All extend `InstagresException`:
+- `NetworkException` - HTTP/network failures
+- `InvalidResponseException` - Invalid API responses
 
 ## Resources
 
@@ -294,4 +187,3 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
