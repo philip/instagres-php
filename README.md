@@ -27,9 +27,9 @@ composer require philip/instagres
 
 require_once 'vendor/autoload.php';
 
-use Neon\Instagres\Client;
+use Philip\Instagres\Client;
 
-// Create a claimable database (uses default referrer: 'neon/instagres')
+// Create a claimable database (uses default referrer: 'instagres-php')
 $database = Client::createClaimableDatabase();
 
 echo "Connection String: {$database['connection_string']}\n";
@@ -79,7 +79,7 @@ composer test:coverage
 
 ```php
 createClaimableDatabase(
-    string  $referrer = 'neon/instagres',
+    string  $referrer = 'instagres-php',
     ?string $dbId     = null
 ): array
 ```
@@ -87,7 +87,7 @@ createClaimableDatabase(
 Creates a claimable Neon database and returns connection information.
 
 **Parameters:**
-- `$referrer` (string, optional): An identifier for your application (default: `'neon/instagres'`)
+- `$referrer` (string, optional): An identifier for your application (default: `'instagres-php'`)
 - `$dbId` (string|null, optional): Custom UUID for the database (auto-generated if not provided)
 
 **Returns:** Array with keys:
@@ -176,8 +176,8 @@ To persist your database beyond 72 hours:
 ## Error handling
 
 ```php
-use Neon\Instagres\Client;
-use Neon\Instagres\Exception\InstagresException;
+use Philip\Instagres\Client;
+use Philip\Instagres\Exception\InstagresException;
 
 try {
     $database = Client::createClaimableDatabase();

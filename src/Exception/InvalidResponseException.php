@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Neon\Instagres\Exception;
+namespace Philip\Instagres\Exception;
 
 /**
  * Exception thrown when API returns invalid or unexpected response

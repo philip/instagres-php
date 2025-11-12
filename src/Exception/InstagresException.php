@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Neon\Instagres\Exception;
+namespace Philip\Instagres\Exception;
 
 use RuntimeException;
 

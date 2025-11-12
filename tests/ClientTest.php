@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Neon\Instagres\Tests;
+namespace Philip\Instagres\Tests;
 
-use Neon\Instagres\Client;
-use Neon\Instagres\Exception\InvalidResponseException;
+use Philip\Instagres\Client;
+use Philip\Instagres\Exception\InvalidResponseException;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase

@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Neon\\Instagres\\": "src/"
+            "Philip\\Instagres\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Neon\\Instagres\\Tests\\": "tests/"
+            "Philip\\Instagres\\Tests\\": "tests/"
         }
     },
     "scripts": {

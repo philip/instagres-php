@@ -16,11 +16,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Neon\Instagres\Client;
-use Neon\Instagres\Exception\InstagresException;
+use Philip\Instagres\Client;
+use Philip\Instagres\Exception\InstagresException;
 
 // Get referrer from command line argument or use SDK default
-$referrer = $argv[1] ?? 'neon/instagres';
+$referrer = $argv[1] ?? 'instagres-php';
 
 echo "\n";
 echo "==========================================\n";

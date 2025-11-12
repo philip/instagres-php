@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Neon\Instagres;
+namespace Philip\Instagres;
 
-use Neon\Instagres\Exception\InstagresException;
-use Neon\Instagres\Exception\InvalidResponseException;
-use Neon\Instagres\Exception\NetworkException;
+use Philip\Instagres\Exception\InstagresException;
+use Philip\Instagres\Exception\InvalidResponseException;
+use Philip\Instagres\Exception\NetworkException;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -26,13 +26,13 @@ class Client
     /**
      * Create a claimable Neon database
      * 
-     * @param string $referrer Referrer identifier (default: 'neon/instagres')
+     * @param string $referrer Referrer identifier (default: 'instagres-php')
      * @param string|null $dbId Optional custom UUID (auto-generated if not provided)
      * @return array{connection_string: string, claim_url: string, expires_at: string} Database info with expiration
      * @throws NetworkException If HTTP request fails
      * @throws InvalidResponseException If API response is invalid or incomplete
      */
-    public static function createClaimableDatabase(string $referrer = 'neon/instagres', ?string $dbId = null): array
+    public static function createClaimableDatabase(string $referrer = 'instagres-php', ?string $dbId = null): array
     {
         // Auto-generate UUID if not provided
         if ($dbId === null) {

@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Neon\Instagres\Client;
-use Neon\Instagres\Exception\InstagresException;
+use Philip\Instagres\Client;
+use Philip\Instagres\Exception\InstagresException;
 
 // Get SQL file path from command line or use default
 $sqlFile = $argv[1] ?? __DIR__ . '/sample-schema.sql';
