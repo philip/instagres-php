@@ -75,7 +75,14 @@ composer test:coverage
 
 ## API reference
 
-### `Client::createClaimableDatabase(string $referrer = 'neon/instagres', ?string $dbId = null): array`
+### `Client::createClaimableDatabase()`
+
+```php
+createClaimableDatabase(
+    string  $referrer = 'neon/instagres',
+    ?string $dbId     = null
+): array
+```
 
 Creates a claimable Neon database and returns connection information.
 
@@ -92,7 +99,11 @@ Creates a claimable Neon database and returns connection information.
 - `NetworkException` - If HTTP request fails or returns non-success status
 - `InvalidResponseException` - If API response is invalid or missing required fields
 
-### `Client::getClaimUrl(string $dbId): string`
+### `Client::getClaimUrl()`
+
+```php
+getClaimUrl(string $dbId): string
+```
 
 Gets the claim URL for a database. This URL is used to claim the temporary database into a Neon account, otherwise it expires (is deleted) after 72 hours.
 
@@ -101,7 +112,11 @@ Gets the claim URL for a database. This URL is used to claim the temporary datab
 
 **Returns:** The claim URL
 
-### `Client::parseConnectionString(string $connectionString): array`
+### `Client::parseConnectionString()`
+
+```php
+parseConnectionString(string $connectionString): array
+```
 
 Parses a PostgreSQL connection string into individual components and PDO-ready format.
 
