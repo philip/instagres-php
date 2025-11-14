@@ -1,5 +1,8 @@
 # Neon Instagres PHP SDK
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/philip/instagres-php.svg?style=flat-square)](https://packagist.org/packages/philip/instagres-php)
+[![Total Downloads](https://img.shields.io/packagist/dt/philip/instagres-php.svg?style=flat-square)](https://packagist.org/packages/philip/instagres-php)
+
 A simple PHP SDK for creating instant claimable [Neon](https://neon.com) PostgreSQL databases with zero configuration.
 
 This SDK provides a PHP implementation of Neon's [Instagres](https://neon.com/docs/reference/neon-launchpad) (formerly Launchpad) feature, allowing you to provision PostgreSQL databases instantly without account creation.
