@@ -18,5 +18,4 @@ Thumbs.db
 
 # Testing
 .phpunit.cache/
-coverage/
 

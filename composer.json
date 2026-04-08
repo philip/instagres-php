@@ -11,7 +11,7 @@
         }
     ],
     "support": {
-        "docs": "https://neon.com/docs/reference/neon-launchpad",
+        "docs": "https://neon.com/docs/reference/claimable-postgres",
         "issues": "https://github.com/philip/instagres-php/issues",
         "source": "https://github.com/philip/instagres-php"
     },
@@ -32,8 +32,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
-        "test:coverage": "phpunit --coverage-html coverage"
+        "test": "phpunit"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
