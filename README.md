@@ -3,17 +3,24 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/philip/instagres.svg?style=flat-square)](https://packagist.org/packages/philip/instagres)
 [![Total Downloads](https://img.shields.io/packagist/dt/philip/instagres.svg?style=flat-square)](https://packagist.org/packages/philip/instagres)
 
-A simple PHP SDK for creating instant claimable [Neon](https://neon.com) PostgreSQL databases with zero configuration.
+**Instagres** (Claimable Postgres) gives you a real [Neon](https://neon.com) Postgres database right away. **No account or auth.** No signup, login, or API key to create a database.
 
-This SDK provides a PHP implementation of Neon's [Instagres](https://neon.com/docs/reference/neon-launchpad) (formerly Launchpad) feature, allowing you to provision PostgreSQL databases instantly without account creation.
+Each database runs for **72 hours** unless you **claim** it into your Neon account. After you claim, it is yours for ongoing use under your free or paid plan. Open the `claim_url` from the API when you are ready.
+
+This package calls Neon's public [Claimable Postgres](https://neon.com/docs/reference/claimable-postgres) API at `neon.new`.
 
 ## Features
 
-- 🚀 Instant database provisioning (no account/auth needed)
-- 🔗 Immediate connection string availability
-- ⏱️ 72-hour database lifespan (claimable for permanent use)
-- 🎯 Simple, clean implementation using industry-standard libraries
-- 🐘 Requires PHP 8.1+
+- Instant provisioning. **No Neon account or auth** to call the create API
+- Connect with the returned URLs. **No Neon login** for queries (only for **claim**)
+- Immediate connection string availability
+- **72-hour** lifespan unless you **claim** the database for permanent use in Neon (`claim_url` in the response)
+- Create a database with one method call
+- Pooled and direct connection strings in the response
+- `getDatabase($id)` to fetch the same resource shape as create
+- Helpers for PDO parsing, claim URLs, and UUID v4 or v7
+- Optional logical replication on create
+- PHP 8.1+
 
 ## Installation
 
@@ -21,9 +28,7 @@ This SDK provides a PHP implementation of Neon's [Instagres](https://neon.com/do
 composer require philip/instagres
 ```
 
-## Usage
-
-### Basic usage
+## Quick start
 
 ```php
 <?php
@@ -32,176 +37,80 @@ require_once 'vendor/autoload.php';
 
 use Philip\Instagres\Client;
 
-// Create a claimable database (uses default referrer: 'instagres-php')
 $database = Client::createClaimableDatabase();
 
-echo "Connection String: {$database['connection_string']}\n";
-echo "Claim URL: {$database['claim_url']}\n";
-echo "Expires At: {$database['expires_at']}\n";
+echo "Pooled (app): {$database['connection_string']}\n";
+echo "Direct (migrations): {$database['direct_connection_string']}\n";
+echo "Id: {$database['id']}\n";
+echo "Claim: {$database['claim_url']}\n";
+echo "Expires: {$database['expires_at']}\n";
 ```
 
-### Running the examples
+The API returns a pooled URL. The SDK adds `direct_connection_string` by adjusting the host.
 
-If you've cloned the repository, you can run the included examples:
+## Documentation
+
+- [Documentation index](docs/README.md)
+- [Migrate from 0.1.x](docs/migration.md)
+- [Usage guide](docs/guide.md)
+- [API reference](docs/reference.md)
+
+## Examples
+
+Clone the repo and run:
 
 ```bash
 composer install
 php examples/create-database.php
 ```
 
-### Database seeding example
+Example output shape (passwords and hosts are fake):
 
-Want to create a database with initial data? Seed with the included sample schema:
+```text
+==========================================
+  Instagres PHP SDK - Create database
+==========================================
 
-```bash
-php examples/seed-database.php
+Creating database...
+ref: instagres-php
+
+✓ SUCCESS! Database created in 850ms
+
+id:
+  01abc123-def4-5678-9abc-def012345678
+
+Pooled connection (app / serverless):
+  postgresql://neondb_owner:npg_xxxxxxxxxxxx@ep-example-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+Direct connection (migrations / admin):
+  postgresql://neondb_owner:npg_xxxxxxxxxxxx@ep-example.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+Claim URL:
+  https://neon.new/claim/01abc123-def4-5678-9abc-def012345678
+
+Expires at:
+  2026-04-11T15:27:22.266Z
+
+==========================================
 ```
 
-This example demonstrates:
-- Creating a database with Instagres
-- Connecting using PDO
-- Executing SQL from a file
-- Verifying the seeded data
-- Real-world database setup patterns
-
-See [`examples/seed-database.php`](examples/seed-database.php) and [`examples/sample-schema.sql`](examples/sample-schema.sql) for the complete implementation.
+Run the script yourself to see real values. Try `php examples/seed-database.php` for PDO plus SQL from a file. Run `INSTAGRES_LIVE=1 php examples/comprehensive.php` for optional live API demos.
 
 ## Testing
 
 ```bash
-# Run all tests
 composer test
-
-# Run tests with coverage report (generates HTML in coverage/ directory)
-composer test:coverage
 ```
-
-## API reference
-
-### `Client::createClaimableDatabase()`
-
-```php
-createClaimableDatabase(
-    string  $referrer = 'instagres-php',
-    ?string $dbId     = null
-): array
-```
-
-Creates a claimable Neon database and returns connection information.
-
-**Parameters:**
-- `$referrer` (string, optional): An identifier for your application (default: `'instagres-php'`)
-- `$dbId` (string|null, optional): Custom UUID for the database (auto-generated if not provided)
-
-**Returns:** Array with keys:
-- `connection_string` (string): PostgreSQL connection string
-- `claim_url` (string): URL to claim the database to your Neon account
-- `expires_at` (string): Expiration timestamp in ISO 8601 format (e.g., "2025-11-15T15:22:03Z")
-
-**Throws:** 
-- `NetworkException` - If HTTP request fails or returns non-success status
-- `InvalidResponseException` - If API response is invalid or missing required fields
-
-### `Client::getClaimUrl()`
-
-```php
-getClaimUrl(string $dbId): string
-```
-
-Gets the claim URL for a database. This URL is used to claim the temporary database into a Neon account, otherwise it expires (is deleted) after 72 hours.
-
-**Parameters:**
-- `$dbId` (string, required): The database UUID
-
-**Returns:** The claim URL
-
-### `Client::parseConnectionString()`
-
-```php
-parseConnectionString(string $connectionString): array
-```
-
-Parses a PostgreSQL connection string into individual components and PDO-ready format.
-
-**Parameters:**
-- `$connectionString` (string, required): PostgreSQL connection string (e.g., `postgresql://user:pass@host/db`)
-
-**Returns:** Array with keys:
-- `host` (string): Database host
-- `port` (string): Port number (defaults to 5432 if not specified)
-- `database` (string): Database name
-- `user` (string): Username
-- `password` (string): Password (URL-decoded)
-- `dsn` (string): PDO DSN string ready for use with `new PDO()`
-- `options` (array): Query string options (e.g., `['sslmode' => 'require']`)
-
-**Throws:**
-- `InvalidResponseException` - If connection string format is invalid
-
-**Example:**
-
-```php
-$database = Client::createClaimableDatabase();
-
-// The returned connection string URI looks similar to:
-// postgresql://user:pass@ep-jolly-fog.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-$parsed = Client::parseConnectionString($database['connection_string']);
-
-// Use with PDO
-$pdo = new PDO($parsed['dsn'], $parsed['user'], $parsed['password']);
-
-// Or access individual components
-echo "Host: {$parsed['host']}\n";
-echo "Port: {$parsed['port']}\n";
-echo "Database: {$parsed['database']}\n";
-```
-
-## Database details
-
-Databases are provisioned on AWS (eu-central-1) running PostgreSQL 17 with Neon Free plan limits. They expire after 72 hours unless claimed.
-
-## Claiming a database
-
-To persist your database beyond 72 hours:
-
-1. Visit the claim URL
-2. Sign in to your Neon account (or create one)
-3. Follow the instructions to claim the database (click a button)
-
-## Use cases
-
-- Development and testing environments
-- Quick prototyping
-- Evaluating Neon before committing to an account
-- CI/CD pipelines requiring temporary databases
-- Demo applications
-
-## Error handling
-
-```php
-use Philip\Instagres\Client;
-use Philip\Instagres\Exception\InstagresException;
-
-try {
-    $database = Client::createClaimableDatabase();
-} catch (InstagresException $e) {
-    echo "Error: {$e->getMessage()}\n";
-}
-```
-
-**Exception types:** All extend `InstagresException`:
-- `NetworkException` - HTTP/network failures
-- `InvalidResponseException` - Invalid API responses
 
 ## Resources
 
-- [Neon Instagres Documentation](https://neon.com/docs/reference/neon-launchpad)
-- [JavaScript Implementation](https://github.com/neondatabase/neon-js/tree/main/packages/get-db)
+- [Claimable Postgres (official API)](https://neon.com/docs/reference/claimable-postgres)
+- [neon-new CLI and Node SDK](https://github.com/neondatabase/neondb-cli/tree/main/packages/neon-new)
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Apache License 2.0. See [LICENSE](LICENSE).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Open a Pull Request. Contributions are welcome.

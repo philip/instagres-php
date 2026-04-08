@@ -4,14 +4,11 @@
 declare(strict_types=1);
 
 /**
- * Neon Instagres - Create Database Example
- * 
- * This example demonstrates how to create a claimable Neon database
- * using the Instagres PHP SDK.
- * 
+ * Claimable Postgres: create database example
+ *
  * Usage:
  *   php examples/create-database.php
- *   php examples/create-database.php my-custom-referrer
+ *   php examples/create-database.php my-app-ref
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -19,53 +16,51 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Philip\Instagres\Client;
 use Philip\Instagres\Exception\InstagresException;
 
-// Get referrer from command line argument or use SDK default
-$referrer = $argv[1] ?? 'instagres-php';
+$ref = $argv[1] ?? 'instagres-php';
 
 echo "\n";
 echo "==========================================\n";
-echo "  Neon Instagres PHP SDK - Example\n";
+echo "  Instagres PHP SDK - Create database\n";
 echo "==========================================\n";
 echo "\n";
 echo "Creating database...\n";
-echo "Referrer: {$referrer}\n";
+echo "ref: {$ref}\n";
 echo "\n";
 
 try {
     $startTime = microtime(true);
-    
-    // Create a claimable database
-    // The SDK automatically generates a UUID and handles all API calls
-    $database = Client::createClaimableDatabase($referrer);
-    
-    $endTime = microtime(true);
-    $duration = round(($endTime - $startTime) * 1000);
-    
-    // Display the results
+
+    $database = Client::createClaimableDatabase($ref);
+
+    $duration = round((microtime(true) - $startTime) * 1000);
+
     echo "✓ SUCCESS! Database created in {$duration}ms\n";
     echo "\n";
-    echo "Connection String:\n";
-    echo "  {$database['connection_string']}\n";
+    echo "id:\n";
+    echo "  {$database['id']}\n";
+    echo "\n";
+    echo "Pooled connection (app / serverless):\n";
+    echo "  {$database['pooled_connection_string']}\n";
+    echo "\n";
+    echo "Direct connection (migrations / admin):\n";
+    echo "  {$database['direct_connection_string']}\n";
     echo "\n";
     echo "Claim URL:\n";
     echo "  {$database['claim_url']}\n";
     echo "\n";
-    echo "Expires At:\n";
+    echo "Expires at:\n";
     echo "  {$database['expires_at']}\n";
     echo "\n";
     echo "==========================================\n";
     echo "\n";
-    echo "💡 Tips:\n";
-    echo "  - Copy the connection string to connect with psql or any PostgreSQL client\n";
-    echo "  - Visit the claim URL to add this database to your Neon account\n";
-    echo "  - This database will expire in 72 hours unless claimed\n";
+    echo "Tips:\n";
+    echo "  - The API returns a pooled URL; direct is derived by the SDK.\n";
+    echo "  - Visit the claim URL within 72 hours to keep the database.\n";
     echo "\n";
-    
+
     exit(0);
-    
 } catch (InstagresException $e) {
     echo "✗ ERROR: {$e->getMessage()}\n";
     echo "\n";
     exit(1);
 }
-

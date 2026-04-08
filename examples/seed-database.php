@@ -4,8 +4,8 @@
 declare(strict_types=1);
 
 /**
- * Neon Instagres - Database Seeding Example
- * 
+ * Claimable Postgres (Instagres): database seeding example
+ *
  * This example demonstrates how to:
  * 1. Create a claimable Neon database
  * 2. Connect to it using PDO
@@ -49,8 +49,8 @@ try {
     
     // Step 2: Parse connection string and connect to the database
     echo "Step 2: Parsing connection string and connecting...\n";
-    
-    // Parse PostgreSQL connection string using SDK helper
+
+    // Claimable Postgres returns a pooled connection string; that is fine for typical app queries and seeding.
     $parsed = Client::parseConnectionString($database['connection_string']);
     
     try {
